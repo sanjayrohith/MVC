@@ -31,11 +31,23 @@ namespace UserCrudRepo.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> Create(User user)
+    public async Task<ActionResult<User>> Create(User user)
+    {
+        var existingUser = await _userRepository.GetByIdAsync(user.Id);
+
+        if (existingUser != null)
         {
-            var created = await _userRepository.AddAsync(user);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            // Update the existing user
+            existingUser.Name = user.Name;
+            existingUser.Email = user.Email;
+            await _userRepository.UpdateAsync(existingUser);
+            return Ok(existingUser); // Return updated data
         }
+        // Create a new user
+        var created = await _userRepository.AddAsync(user);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, User user)
