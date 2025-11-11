@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using UserCrudRepo.Models;
 using UserCrudRepo.Repository;
 
@@ -31,30 +32,48 @@ namespace UserCrudRepo.Controllers
         }
 
         [HttpPost]
-    public async Task<ActionResult<User>> Create(User user)
-    {
-        var existingUser = await _userRepository.GetByIdAsync(user.Id);
-
-        if (existingUser != null)
+        public async Task<ActionResult<User>> Create(User user)
         {
-            // Update the existing user
-            existingUser.Name = user.Name;
-            existingUser.Email = user.Email;
-            await _userRepository.UpdateAsync(existingUser);
-            return Ok(existingUser); // Return updated data
+            try
+            {
+                var created = await _userRepository.AddAsync(user);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("Only Gmail"))
+            {
+                return BadRequest(new { message = "Only Gmail addresses are allowed." });
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already exists"))
+            {
+                return Conflict(new { message = "Email already exists." });
+            }
+            catch (DbUpdateException)
+            {
+                return Conflict(new { message = "Email already exists." });
+            }
         }
-        // Create a new user
-        var created = await _userRepository.AddAsync(user);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-    }
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, User user)
         {
             if (id != user.Id) return BadRequest();
-            await _userRepository.UpdateAsync(user);
-            return NoContent();
+            try
+            {
+                await _userRepository.UpdateAsync(user);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("Only Gmail"))
+            {
+                return BadRequest(new { message = "Only Gmail addresses are allowed." });
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already exists"))
+            {
+                return Conflict(new { message = "Email already exists." });
+            }
+            catch (DbUpdateException)
+            {
+                return Conflict(new { message = "Email already exists." });
+            }
         }
 
         [HttpDelete("{id}")]
