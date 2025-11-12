@@ -13,12 +13,13 @@ namespace UserCrudRepo.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<User>> GetAllAsync()  
         {
-            return await _context.Users.ToListAsync();
-        }
+            return await _context.Users.Where(u => u.Status == 1).ToListAsync();    //return only active users
+        }   
 
-        public async Task<User?> GetByIdAsync(int id)
+
+        public async Task<User?> GetByIdAsync(int id) 
         {
             return await _context.Users.FindAsync(id);
         }
@@ -51,6 +52,7 @@ namespace UserCrudRepo.Repository
             await _context.SaveChangesAsync();
         }
 
+
         public async Task DeleteAsync(int id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -58,5 +60,6 @@ namespace UserCrudRepo.Repository
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
+        
     }
 }

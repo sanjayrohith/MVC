@@ -16,21 +16,13 @@ namespace UserCrudRepo.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpGet]
+        [HttpGet]  
         public async Task<ActionResult<IEnumerable<User>>> GetAll()
         {
             var users = await _userRepository.GetAllAsync();
             return Ok(users);
         }
         
-        //getting only the active users
-        [HttpGet("active")]
-        public async Task<ActionResult<IEnumerable<User>>> GetActiveUsers()
-        {
-            var users = await _userRepository.GetAllAsync();
-            return Ok(users.Where(u => u.Status == 1));
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetById(int id)
         {
