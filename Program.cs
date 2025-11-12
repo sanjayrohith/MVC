@@ -32,5 +32,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.MapControllers();
+app.MapControllers();   //this method automatically maps all controller routes
 app.Run();

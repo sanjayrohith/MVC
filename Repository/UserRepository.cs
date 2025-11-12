@@ -23,28 +23,27 @@ namespace UserCrudRepo.Repository
             return await _context.Users.FindAsync(id);
         }
 
-public async Task<User> AddAsync(User user)
-    {
-        // Check if user with same ID already exists
-        var existingUser = await _context.Users.FindAsync(user.Id);
-
-        if (existingUser != null)
+        public async Task<User> AddAsync(User user)
         {
-            // Update existing user fields
-            existingUser.Name = user.Name;
-            existingUser.Email = user.Email;
+            // Check if user with same ID already exists
+            var existingUser = await _context.Users.FindAsync(user.Id);
 
-            _context.Users.Update(existingUser);
+            if (existingUser != null)
+            {
+                // Update existing user fields
+                existingUser.Name = user.Name;
+                existingUser.Email = user.Email;
+
+                _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
+                return existingUser;
+            }
+
+            // If not found, create a new one
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return existingUser;
+            return user;
         }
-
-        // If not found, create a new one
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return user;
-    }
-
 
         public async Task UpdateAsync(User user)
         {
