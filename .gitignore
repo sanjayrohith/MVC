@@ -1,6 +1,25 @@
+# Build output
 bin/
 obj/
+
+# SQLite database files
 *.db
 *.db-shm
 *.db-wal
+
+# Environment files (secrets)
 .env
+appsettings.Development.json
+
+# Logs
+*.log
+
+# User-specific files (VS, VSCode, Rider)
+.vscode/
+.vs/
+*.user
+*.suo
+
+# Backup files
+*.bak
+*.tmp
